@@ -167,6 +167,47 @@ class AtomGitButtonClicker:
                     button.click()
                     logger.info("'免费领取'按钮点击成功")
 
+                    # 随机等待2-5秒
+                    delay = random.uniform(2, 5)
+                    logger.info(f"随机等待 {delay:.2f} 秒")
+                    time.sleep(delay)
+
+                    # 查找并点击"确认领取"按钮
+                    logger.info("查找'确认领取'按钮...")
+                    confirm_button = None
+
+                    # 尝试通过多种方式定位确认按钮
+                    try:
+                        # 尝试通过文本内容定位
+                        confirm_button = driver.find_element(By.XPATH, "//button[contains(text(), '确认领取')]")
+                        logger.info("通过文本内容找到'确认领取'按钮")
+                    except Exception:
+                        pass
+
+                    if not confirm_button:
+                        try:
+                            # 尝试通过遍历按钮定位
+                            buttons = driver.find_elements(By.TAG_NAME, "button")
+                            for btn in buttons:
+                                if "确认领取" in btn.text:
+                                    confirm_button = btn
+                                    logger.info("通过遍历按钮找到'确认领取'按钮")
+                                    break
+                        except Exception:
+                            pass
+
+                    if confirm_button:
+                        # 等待按钮可点击
+                        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable(confirm_button)
+                        )
+                        # 点击确认按钮
+                        confirm_button.click()
+                        logger.info("'确认领取'按钮点击成功")
+                    else:
+                        logger.error("未找到'确认领取'按钮")
+                        return False
+
                     # 等待操作完成
                     logger.info("等待操作完成...")
                     time.sleep(8)  # 增加等待时间确保操作完成
